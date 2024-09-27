@@ -2,7 +2,6 @@
 import React from 'react'
 import './StudentForm.css';
 import { useState } from 'react';
-import { useCallback } from 'react';
 import { useContext } from 'react';
 import StuContext from '../store/StuContext';
 import useFetch from '../hooks/useFetch';
