@@ -1,5 +1,6 @@
 import React from 'react'
 import Student from './Student';
+import StudentForm from './StudentForm';
 
 const StudentList = (props) => {
   return (
@@ -16,6 +17,9 @@ const StudentList = (props) => {
         <tbody>
             {props.stus.map(stu => <Student key={stu.id} stu={stu}/>)}
         </tbody>
+        <tfoot>
+          <StudentForm></StudentForm>
+        </tfoot>
     </table>
   )
 }
