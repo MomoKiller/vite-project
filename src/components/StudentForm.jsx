@@ -5,20 +5,23 @@ import { useState } from 'react';
 import { useCallback } from 'react';
 import { useContext } from 'react';
 import StuContext from '../store/StuContext';
+import useFetch from '../hooks/useFetch';
 
-export default function StudentForm() {
+export default function StudentForm(props) {
 
   const ctx = useContext(StuContext);
 
   const [inputData, setInputData] = useState({
-    name: '',
-    gender: '男',
-    age: '',
-    address: ''
+    name: props.stu ? props.stu.name : '',
+    gender: props.stu ? props.stu.gender : '男',
+    age: props.stu ? props.stu.age : '',
+    address: props.stu ? props.stu.address : ''
   });
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { loading, error, fetchData: updateStudent } = useFetch({
+    url: props.stu ? `students/${props.stu.id}` : 'students',
+    method: props.stu ? 'put' : 'post',
+  }, ctx.fetchData);
 
   const nameChangeHandler = (e) => {
     setInputData(preState => ({...preState, name: e.target.value}));
@@ -33,34 +36,14 @@ export default function StudentForm() {
     setInputData(preState => ({...preState, address: e.target.value}));
   };
 
-  const addStudent = useCallback(async (newStu) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await fetch('http://localhost:1337/api/students', {
-        method: 'post',
-        body: JSON.stringify({data: newStu}),
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-      if(!res.ok) {
-        throw new Error('数据添加失败');
-      }
-      // 刷新
-      ctx.fetchData();
-    } catch (e) {
-      setError(e);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
   const submitHandler = () => {
     console.log(inputData);
-
-    addStudent(inputData);
+    updateStudent(inputData);
   };
+
+  const updateHandler = () => {
+    updateStudent(inputData);
+  }
 
   return (
     <>
@@ -81,7 +64,13 @@ export default function StudentForm() {
             <input type="text" onChange={addressChangeHandler} value={inputData.address}/>
           </td>
           <td>
-            <button onClick={submitHandler}>添加</button>
+            {props.stu && 
+              <>
+                <button onClick={props.onCancel}>取消</button>
+                <button onClick={updateHandler}>确认</button>
+              </>
+            }
+            { !props.stu && <button onClick={submitHandler}>添加</button>}
           </td>
       </tr>
       {loading && <tr><td colSpan={5}>正在添加</td></tr>}

@@ -1,33 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import './App.css'
 import StudentList from './components/StudentList'
-import { useCallback } from 'react';
 import StuContext from './store/StuContext';
+import useFetch from './hooks/useFetch';
 
 function App() {
-  const [stuData, setStuData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  // 记录错误信息
-  const [error, setError] = useState(null); 
 
-  const fetchData = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await fetch('http://localhost:1337/api/students');
-      if(res.ok) {
-        const data = await res.json();
-        console.log(data.data);
-        setStuData(data.data);
-      }else {
-        throw new Error('数据加载失败');
-      }
-    } catch (e) {
-      setError(e);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const { data: stuData, loading, error, fetchData } = useFetch({
+    url: 'students'
+  });
 
   const loadDataHandler = () => {
     fetchData();
